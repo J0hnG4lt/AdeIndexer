@@ -159,21 +159,24 @@ object Index {
 
   }
 
-  def searchIndex(query: String, config: AdeIndexerConfig):Unit = {
+  def searchIndex(query: String, config: AdeIndexerConfig):Map[String, Float] = {
     val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
     logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
     val indexReader = DirectoryReader.open(indexDirectory)
     val searcher = new IndexSearcher(indexReader)
     val regexQuery = new RegexpQuery(new Term("contents", query.replace(" ", "|")))
-    val results = searcher.search(regexQuery, 10)
-    logger.info(regexQuery.toString())
-    logger.info("numDocs: "+indexReader.numDocs())
-    logger.info("Results: " + results.totalHits.toString)
-    if (results.totalHits.value > 0) {
-          val firstHit = searcher.doc(results.scoreDocs(0).doc)
-          logger.info(firstHit.getField("path").stringValue)
-    }
-
+    val totalIndexedDocs = indexReader.numDocs()
+    logger.info("numDocs: "+totalIndexedDocs)
+    val results = searcher.search(regexQuery, totalIndexedDocs)
+    val scoredDocs = results.scoreDocs.map(
+      scoreDoc => {
+        val idoc = scoreDoc.doc
+        val doc = searcher.doc(idoc)
+        (doc.getField("path").stringValue, scoreDoc.score)
+      }
+    ).toMap
+    logger.info("totalHits: " + results.totalHits.toString)
+    scoredDocs
   }
 
   def searchIndexAll(query: String, config: AdeIndexerConfig):Unit = {

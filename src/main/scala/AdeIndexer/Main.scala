@@ -18,7 +18,8 @@ object Main {
     val config = AdeIndexerConfig(directory = argConfig.directory, indexDirectory = argConfig.indexDirectory)
     addFilesToIndex(config=config)
     //val directory = buildDirectory(config=config.directory)
-    searchIndex(query=argConfig.query, config=config)
+    val scoredDocs = searchIndex(query=argConfig.query, config=config)
+    logger.info(scoredDocs.toString())
   }
 
 }
