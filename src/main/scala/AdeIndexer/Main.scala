@@ -3,7 +3,12 @@ package AdeIndexer
 import AdeIndexer.cli.ArgParser
 import AdeIndexer.logging.LoggerUtils.logger
 import AdeIndexer.logging.LoggerUtils.prettyPrint
-import AdeIndexer.indexer.Index.{addFilesToIndex, buildDirectory, searchIndex}
+import AdeIndexer.indexer.Index.{
+  searchIndexByMultiPhrase,
+  searchIndex,
+  addFilesToIndex,
+  searchIndexByBoolean
+}
 import AdeIndexer.config.AdeIndexerConfig
 
 object Main {
@@ -18,7 +23,9 @@ object Main {
     val config = AdeIndexerConfig(directory = argConfig.directory, indexDirectory = argConfig.indexDirectory)
     addFilesToIndex(config=config)
     //val directory = buildDirectory(config=config.directory)
-    val scoredDocs = searchIndex(query=argConfig.query, config=config)
+    //searchIndexByPhrase(query=argConfig.query, config=config)
+    //val scoredDocs = searchIndex(query=argConfig.query, config=config)
+    val scoredDocs = searchIndexByBoolean(query=argConfig.query, config=config)
     logger.info(scoredDocs.toString())
   }
 
