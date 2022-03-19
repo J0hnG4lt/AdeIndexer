@@ -27,16 +27,20 @@ object Index {
 
   def addFilesToIndex(config: AdeIndexerConfig): Unit = {
 
+    // Get the directory with files and the directory for the index.
     val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
     val fileDirectory = buildDirectory(directoryUri=config.directory)
 
-    //val analyzer = new StandardAnalyzer()
+    // Use a custom analyzer to ensure exact matches. Lucene otherwise would apply NLP transformations to the tokens.
     val analyzer = CustomAnalyzer.builder().withTokenizer("standard").build()
-
     val indexWriterConfig = new IndexWriterConfig(analyzer)
+
+    // We use a custom Similarity to replicate the Score that is required by the challenge.
     indexWriterConfig.setSimilarity(CountSimilarity())
     indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
     val indexWriter = new IndexWriter(indexDirectory, indexWriterConfig)
+
+    // Delete previous inverted index.
     indexWriter.deleteAll()
 
     val files = fileDirectory.listAll()
@@ -44,47 +48,40 @@ object Index {
       filename => {
         breakable {
 
+          // We only index text files.
+          // TODO: extend this for other file formats.
           if (!filename.endsWith(".txt")){
             logger.fine(s"Skipping: ${filename}")
             break
           }
 
+          // Read the file
           val path = fileDirectory.getDirectory.resolve(filename).toAbsolutePath
           val file = path.toFile
+          logger.info(s"Indexing File: ${path.toAbsolutePath}")
 
-          logger.info(s"Filename: ${path.toAbsolutePath}")
-
-//          val fileReader = new FileReader(file)
-//          val bufferedReader = new BufferedReader(fileReader)
           val lines = scala.io.Source.fromFile(file).mkString
-          logger.info(lines)
+          logger.fine(lines)
+
+          // Index the file contents along with its path and filename
           val document = new Document()
-          //document.add(new TextField("contents", fileReader))
-//          val fieldType = new FieldType()
-//          fieldType.setStoreTermVectors(true)
-//          fieldType.setStoreTermVectorPositions(true)
-//          fieldType.setStoreTermVectorOffsets(true)
-//          fieldType.setIndexOptions(IndexOptions.DOCS)
-
-          //document.add(new Field("contents", lines, fieldType))
           document.add(new TextField("contents", lines, Field.Store.NO))
-
           document.add(new StringField("path", file.getPath, Field.Store.YES))
           document.add(new StringField("filename", file.getName, Field.Store.YES))
 
+          // Commit to Index
           indexWriter.addDocument(document)
           indexWriter.flush()
           indexWriter.commit()
-
         }
-
       }
     )
 
+    // Close all open resources
     indexWriter.close()
     fileDirectory.close()
     indexDirectory.close()
-    logger.info(s"IndexWriter closed.")
+    logger.info(s"All files in ${config.directory} have been indexed.")
   }
 
   def searchIndexByBoolean(query: String, config: AdeIndexerConfig):Map[String, Float] = {
