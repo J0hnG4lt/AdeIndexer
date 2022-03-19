@@ -11,6 +11,7 @@ import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.config.ArgParser.ArgParserConfig
 import AdeIndexer.postprocessing.Scaler
 import java.util.logging.Logger
+import AdeIndexer.repl.IndexingRepl
 
 object Main {
 
@@ -23,12 +24,24 @@ object Main {
     logger.info("Input arguments: ")
     logger.info(prettyPrint(argConfig))
 
-    val config = AdeIndexerConfig(directory = argConfig.directory, indexDirectory = argConfig.indexDirectory)
+    val config = AdeIndexerConfig(
+      directory = argConfig.directory,
+      indexDirectory = argConfig.indexDirectory
+    )
     addFilesToIndex(config=config)
 
-    val scoredDocs = searchIndexAndScoreAll(query=argConfig.query, config=config)
-    val rescaledDocs = Scaler.rescaleScores(scoredDocs)
-    logger.info(rescaledDocs.toString())
+    val repl = new IndexingRepl(config=config)
+    var scoredDocs: Option[Map[String, Float]] = None
+    argConfig.query match {
+      case None => repl.startReplLoop()
+      case Some(query) => {
+        scoredDocs = Some(searchIndexAndScoreAll(query=query, config=config))
+      }
+    }
+    scoredDocs match {
+      case Some(docs) => println(docs.toString())
+      case _ => None
+    }
   }
 
 }

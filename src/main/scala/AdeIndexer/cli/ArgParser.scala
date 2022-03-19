@@ -20,7 +20,7 @@ object ArgParser {
           .action((indexDirectory, config) => config.copy(indexDirectory = indexDirectory))
           .text("i is the path to a directory where the index will be stored"),
         builder.opt[String]('q', "query")
-          .action((query, config) => config.copy(query = query))
+          .action((query, config) => config.copy(query = Some(query)))
           .text("q is the query"),
         builder.help("help").text("prints this usage text")
         // more options here...
@@ -28,7 +28,6 @@ object ArgParser {
     }
     parser
   }
-
 
   def parse(parser: OParser[Unit, ArgParserConfig], args: Array[String]): ArgParserConfig = {
     // OParser.parse returns Option[Config]
