@@ -4,10 +4,8 @@ import AdeIndexer.cli.ArgParser
 
 import AdeIndexer.logging.LoggerUtils.prettyPrint
 import AdeIndexer.indexer.Index.{
-  searchIndexByMultiPhrase,
-  searchIndex,
   addFilesToIndex,
-  searchIndexByBoolean
+  searchIndexAndScoreAll
 }
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.config.ArgParser.ArgParserConfig
@@ -27,10 +25,8 @@ object Main {
 
     val config = AdeIndexerConfig(directory = argConfig.directory, indexDirectory = argConfig.indexDirectory)
     addFilesToIndex(config=config)
-    //val directory = buildDirectory(config=config.directory)
-    //searchIndexByPhrase(query=argConfig.query, config=config)
-    //val scoredDocs = searchIndex(query=argConfig.query, config=config)
-    val scoredDocs = searchIndexByBoolean(query=argConfig.query, config=config)
+
+    val scoredDocs = searchIndexAndScoreAll(query=argConfig.query, config=config)
     val rescaledDocs = Scaler.rescaleScores(scoredDocs)
     logger.info(rescaledDocs.toString())
   }

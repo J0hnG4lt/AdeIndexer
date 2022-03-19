@@ -87,33 +87,6 @@ object Index {
     logger.info(s"IndexWriter closed.")
   }
 
-  def searchIndexByMultiPhrase(query: String, config: AdeIndexerConfig):Unit = {
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
-    logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
-    val indexReader = DirectoryReader.open(indexDirectory)
-    val searcher = new IndexSearcher(indexReader)
-    val termQuery = new TermQuery(new Term("contents", query))
-    val phraseQueryBuilder = new MultiPhraseQuery.Builder()
-    val words = query.split(" ")
-    words.foreach( word => {
-        logger.fine(s"Word: ${word}")
-        phraseQueryBuilder.add(new Term("contents", word))
-      }
-    )
-
-    phraseQueryBuilder.setSlop(100)
-    val phraseQuery = phraseQueryBuilder.build()
-    val results = searcher.search(phraseQuery, 10)
-
-    logger.info("numDocs: "+indexReader.numDocs())
-    logger.info("Results: " + results.totalHits.toString)
-    if (results.totalHits.value > 0) {
-      val firstHit = searcher.doc(results.scoreDocs(0).doc)
-      logger.info(firstHit.getField("contents").stringValue)
-    }
-
-  }
-
   def searchIndexByBoolean(query: String, config: AdeIndexerConfig):Map[String, Float] = {
     val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
     logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
@@ -143,60 +116,33 @@ object Index {
     scoredDocs
   }
 
-  def searchIndexByWildcard(query: String, config: AdeIndexerConfig):Unit = {
+  def searchIndexAll(query: String, config: AdeIndexerConfig):Map[String, Float]  = {
     val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
     logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
     val indexReader = DirectoryReader.open(indexDirectory)
     val searcher = new IndexSearcher(indexReader)
-    val regexQuery = new WildcardQuery(new Term("contents", query));
-    val results = searcher.search(regexQuery, 10)
-
+    val matchAllDocsQuery = new MatchAllDocsQuery()
+    val results = searcher.search(matchAllDocsQuery, 10)
     logger.info("numDocs: "+indexReader.numDocs())
-    logger.info("Results: " + results.totalHits.toString)
-    if (results.totalHits.value > 0) {
-      val firstHit = searcher.doc(results.scoreDocs(0).doc)
-      logger.info(firstHit.getField("contents").stringValue)
-    }
-
-  }
-
-  def searchIndex(query: String, config: AdeIndexerConfig):Map[String, Float] = {
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
-    logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
-    val indexReader = DirectoryReader.open(indexDirectory)
-    val searcher = new IndexSearcher(indexReader)
-    //searcher.setSimilarity(CustomSimilarity())
-    val regexQuery = new RegexpQuery(new Term("contents", query.replace(" ", "|")))
-    val totalIndexedDocs = indexReader.numDocs()
-    logger.info("numDocs: "+totalIndexedDocs)
-    val results = searcher.search(regexQuery, totalIndexedDocs)
     val scoredDocs = results.scoreDocs.map(
       scoreDoc => {
         val idoc = scoreDoc.doc
         val doc = searcher.doc(idoc)
-        (doc.getField("path").stringValue, scoreDoc.score)
+        (doc.getField("path").stringValue, 0.toFloat)
       }
     ).toMap
-    logger.info("totalHits: " + results.totalHits.toString)
     scoredDocs
   }
 
-  def searchIndexAll(query: String, config: AdeIndexerConfig):Unit = {
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
-    logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
-    val indexReader = DirectoryReader.open(indexDirectory)
-    val searcher = new IndexSearcher(indexReader)
-    val term = new Term("contents", query)
-    val termQuery = new TermQuery(term)
-    val boolQuery = BooleanQuery.Builder().add(termQuery, BooleanClause.Occur.MUST).build()
-    val matchAllDocsQuery = new MatchAllDocsQuery()
-    val results = searcher.search(matchAllDocsQuery, 10)
-
-    logger.info("numDocs: "+indexReader.numDocs())
-    logger.info("Results: " + results.totalHits.toString)
-    //    // Present the first (and only) hit
-    //    val firstHit = searcher.doc(results.scoreDocs(0).doc)
-    //    logger.info(firstHit.getField("contents").stringValue)
+  def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float]  = {
+    val allDocs = searchIndexAll(query=query, config = config)
+    val scoredDocs = searchIndexByBoolean(query=query, config = config)
+    val mergedDocs = allDocs.map(
+      docAll => {
+        (docAll._1, scoredDocs.getOrElse(docAll._1, docAll._2))
+      }
+    )
+    mergedDocs
   }
 
 }
