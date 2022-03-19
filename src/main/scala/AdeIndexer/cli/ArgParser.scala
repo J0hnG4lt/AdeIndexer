@@ -3,15 +3,9 @@ package AdeIndexer.cli
 import scopt.OParser
 
 import AdeIndexer.exceptions.CustomExceptions.WrongArgumentsException
+import AdeIndexer.config.ArgParser.ArgParserConfig
 
 object ArgParser {
-
-  case class ArgParserConfig(
-                              directory: String = System.getProperty("user.dir"),
-                              indexDirectory: String = System.getProperty("user.dir")+"/index/",
-                              query: String = "",
-                              wrongArgument: Boolean = false
-                            )
 
   def buildParser(): OParser[Unit, ArgParserConfig] = {
     val builder = OParser.builder[ArgParserConfig]

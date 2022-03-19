@@ -1,6 +1,6 @@
 package AdeIndexer.logging
 
-import AdeIndexer.config.AdeIndexerConfig
+import AdeIndexer.config.Indexer.AdeIndexerConfig
 
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -70,10 +70,4 @@ object LoggerUtils {
     }
   }
 
-  def buildLogger(config: AdeIndexerConfig = AdeIndexerConfig()): java.util.logging.Logger = {
-    val name = config.loggerName
-    val logger = Logger.getLogger(name)
-    logger
-  }
-  val logger = buildLogger()
 }

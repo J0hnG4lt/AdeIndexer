@@ -11,11 +11,14 @@ import org.apache.lucene.queryparser.classic.QueryParser
 import java.nio.file.{Path, Paths}
 import java.io.{BufferedReader, File, FileReader}
 import util.control.Breaks.*
-import AdeIndexer.config.AdeIndexerConfig
-import AdeIndexer.logging.LoggerUtils.logger
-import AdeIndexer.indexer.CustomSimilarity
+import AdeIndexer.config.Indexer.AdeIndexerConfig
+import AdeIndexer.indexer.CountSimilarity
+
+import java.util.logging.Logger
 
 object Index {
+
+  val logger = Logger.getLogger(this.getClass.getName)
 
   def buildDirectory(directoryUri: String): FSDirectory = {
     val directory = FSDirectory.open(Path.of(directoryUri))
@@ -31,7 +34,7 @@ object Index {
     val analyzer = CustomAnalyzer.builder().withTokenizer("standard").build()
 
     val indexWriterConfig = new IndexWriterConfig(analyzer)
-    //indexWriterConfig.setSimilarity(CustomSimilarity())
+    indexWriterConfig.setSimilarity(CountSimilarity())
     indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
     val indexWriter = new IndexWriter(indexDirectory, indexWriterConfig)
     indexWriter.deleteAll()
@@ -116,7 +119,7 @@ object Index {
     logger.info(DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
     val indexReader = DirectoryReader.open(indexDirectory)
     val searcher = new IndexSearcher(indexReader)
-    //searcher.setSimilarity(CustomSimilarity())
+    searcher.setSimilarity(CountSimilarity())
     val booleanQueryBuilder = new BooleanQuery.Builder
     val words = query.split(" ")
     words.foreach( word => {
