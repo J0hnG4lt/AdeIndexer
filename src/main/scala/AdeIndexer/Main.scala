@@ -46,7 +46,7 @@ object Main {
       case Some(query) => scoredDocs = Some(searchIndexAndScoreAll(query=query, config=config))
     }
     scoredDocs match {
-      case Some(docs) => println(docs.toString())
+      case Some(docs) => println(docs.mkString("\n"))
       case _ => println("REPL finished.")
     }
   }

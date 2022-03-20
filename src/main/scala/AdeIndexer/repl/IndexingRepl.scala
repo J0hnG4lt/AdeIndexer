@@ -51,7 +51,7 @@ class IndexingRepl(config: AdeIndexerConfig) {
    * */
   def runIndexer(words: String):Unit = {
     val scoredDocs = searchIndexAndScoreAll(query=words, config=config)
-    println(scoredDocs.toString())
+    println(scoredDocs.mkString("\n"))
   }
 
   /** Evaluates the input given by the user in [[startReplLoop]]. If a command in [[Commands]] is not matched,
