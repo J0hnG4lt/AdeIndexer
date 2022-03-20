@@ -39,7 +39,7 @@ src/
 
 ## Requirements
 
-- openjdk version "11.0.14"
+- openjdk version "17"
 - Maven 3.8.1
 - Developed with IntelliJ
 
