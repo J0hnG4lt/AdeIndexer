@@ -114,3 +114,12 @@ Something like the following should appear:
 ```commandline
 Map(/home/georvic/repos/infra/AdeIndexer/src/test/resources/names.txt -> 100.0, /home/georvic/repos/infra/AdeIndexer/src/test/resources/names2.txt -> 33.333336, /home/georvic/repos/infra/AdeIndexer/src/test/resources/names3.txt -> 0.0)
 ```
+
+## References
+
+- Shaded Jars: https://cloud.google.com/dataproc/docs/guides/manage-spark-dependencies?hl=en
+- Lucene: 
+  - https://lucene.apache.org/core/8_11_1/core/
+  - https://www.goodreads.com/book/show/55042721-practical-apache-lucene-8
+- Utility function from here to print/log case classes: https://gist.github.com/carymrobbins/7b8ed52cd6ea186dbdf8
+- I did some research first on similar projects: https://github.com/PointerFLY/Lucene-Example/tree/master/src/main/java
