@@ -1,5 +1,8 @@
 # AdeIndexer
 
+An command line tools that builds an inverted index on a folder with .txt files and allows for the execution of
+efficient searches on it.
+
 ## Layout and conventions
 
 ```text
@@ -21,7 +24,7 @@ src/
 │           │   └── Index.scala: all the code related to the inverted index and searches.
 │           ├── logging
 │           │   └── LoggerUtils.scala
-│           ├── Main.scala
+│           ├── Main.scala: entrypoint for the JAR
 │           ├── postprocessing
 │           │   └── Scaler.scala: a utility function for rescaling scores to 0 <= x <= 100
 │           └── repl
