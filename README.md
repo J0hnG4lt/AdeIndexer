@@ -1,7 +1,8 @@
 # AdeIndexer
 
-An command line tools that builds an inverted index on a folder with .txt files and allows for the execution of
-efficient searches on it.
+A command line tool that builds an inverted index on a folder with .txt files and allows for the execution of 
+efficient searches on it. By default, an index directory will be created on the current directory if no `-i` option 
+is specified. This solution builds the inverted index on the file system rather than having it in memory.
 
 ## Layout and conventions
 
