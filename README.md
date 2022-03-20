@@ -36,6 +36,11 @@ src/
     │   ├── names3.txt
     │   └── names.txt
     └── scala
+        └── AdeIndexer
+            └── indexer
+                ├── CountSimilaritySuite.scala
+                └── IndexSuite.scala
+
 ```
 
 ## Requirements
