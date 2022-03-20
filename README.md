@@ -45,6 +45,10 @@ src/
 
 ## Usage
 
+### Logging
+
+Use the parameter `-Djava.util.logging.config.file=src/main/resources/logging.properties` with java to use a FINE logging level.
+
 ### Get help
 
 ```bash
