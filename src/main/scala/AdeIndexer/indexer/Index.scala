@@ -111,7 +111,7 @@ object Index {
    *
    * @param query: words separated by whitespace.
    * @param config: a config case class for the Indexer.
-   * @returm a map of filepath -> score
+   * @return a map of filepath -> score
    * */
   def searchIndexByBoolean(query: String, config: AdeIndexerConfig):Map[String, Float] = {
     logger.fine("searchIndexByBoolean")
@@ -127,6 +127,7 @@ object Index {
     // Build a searcher for the indexed documents.
     val searcher = new IndexSearcher(indexReader)
     // We need to use the same similarity that we used during indexing.
+    // TODO: allow for the use of a different similarity.
     searcher.setSimilarity(CountSimilarity())
 
     // We use a boolean OR query for all words given as input.
@@ -152,6 +153,12 @@ object Index {
     scoredDocs
   }
 
+  /** Retrieves all the documents of the index in config.indexDirectory with a score of 0.
+   *
+   * @param query: words separated by whitespace.
+   * @param config: a config case class for the Indexer.
+   * @return a map of filepath -> score
+   * */
   def searchIndexAll(query: String, config: AdeIndexerConfig):Map[String, Float]  = {
     logger.fine("searchIndexAll")
 
@@ -179,6 +186,13 @@ object Index {
     scoredDocs
   }
 
+  /** Applies [[searchIndexByBoolean]] and [[searchIndexAll]] and then merges their results by using
+   * the scores given by [[searchIndexByBoolean]].
+   *
+   * @param query: words separated by whitespace.
+   * @param config: a config case class for the Indexer.
+   * @return a map of filepath -> score
+   * */
   def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float]  = {
     logger.fine("searchIndexAndScoreAll")
 
