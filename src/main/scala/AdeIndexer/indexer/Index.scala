@@ -8,24 +8,39 @@ import org.apache.lucene.store.{Directory, FSDirectory}
 import org.apache.lucene.search.{BooleanClause, BooleanQuery, IndexSearcher, MatchAllDocsQuery, Query, TermQuery}
 import org.apache.lucene.queryparser.classic.QueryParser
 
+import java.util.logging.Logger
 import java.nio.file.{Path, Paths}
 import java.io.{BufferedReader, File, FileReader}
 import util.control.Breaks.{break, breakable}
+
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.indexer.CountSimilarity
 import AdeIndexer.postprocessing.Scaler.rescaleScores
 
-import java.util.logging.Logger
 
+/** Defines all the methods related to the Inverted Index implemented by Lucene.
+ *
+ * */
 object Index {
 
   private val logger = Logger.getLogger(this.getClass.getName)
 
+  /** Builds a File System Directory representation for Lucene.
+   *
+   * @param directoryUri: the path to the local directory.
+   * @return a directory representation for Lucene.
+   * */
   def buildDirectory(directoryUri: String): FSDirectory = {
     val directory = FSDirectory.open(Path.of(directoryUri))
     directory
   }
 
+  /** Reads all the files contained in config.directory and builds and index in config.indexDirectory.
+   * The contents, filename, filepaths of the files are taken into account.
+   * Currently, a simple score based on counts is used as a Similarity measure.
+   *
+   * @param config: a config case class for the Indexer.
+   * */
   def addFilesToIndex(config: AdeIndexerConfig): Unit = {
 
     // Get the directory with files and the directory for the index.
@@ -37,6 +52,7 @@ object Index {
     val indexWriterConfig = new IndexWriterConfig(analyzer)
 
     // We use a custom Similarity to replicate the Score that is required by the challenge.
+    // TODO: use a better similarity or allow for the use of a different one by config
     indexWriterConfig.setSimilarity(CountSimilarity())
     indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
     val indexWriter = new IndexWriter(indexDirectory, indexWriterConfig)
@@ -87,6 +103,16 @@ object Index {
     logger.info(s"All files in ${config.directory} have been indexed.")
   }
 
+  /** Search a built index by using a OR-type of Lucene Boolean query.
+   * The indexer in config.indexDirectory is read and all the documents matching the query
+   * are returned with a score and a filepath. The Similarity measure that we currently use
+   * is a simple counter. For example, if query == "Georvic Tur" and "Georvic" appears in the document whereas "Tur"
+   * does not appear, then the score would be 50 for that document. If both words appear, then the score would be 100.
+   *
+   * @param query: words separated by whitespace.
+   * @param config: a config case class for the Indexer.
+   * @returm a map of filepath -> score
+   * */
   def searchIndexByBoolean(query: String, config: AdeIndexerConfig):Map[String, Float] = {
     logger.fine("searchIndexByBoolean")
 
