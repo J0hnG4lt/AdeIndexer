@@ -9,7 +9,6 @@ import AdeIndexer.indexer.Index.{
 }
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.config.ArgParser.ArgParserConfig
-import AdeIndexer.postprocessing.Scaler
 import java.util.logging.Logger
 import AdeIndexer.repl.IndexingRepl
 

@@ -38,8 +38,7 @@ class IndexingRepl(config: AdeIndexerConfig) {
 
   def runIndexer(words: String):Unit = {
     val scoredDocs = searchIndexAndScoreAll(query=words, config=config)
-    val rescaledDocs = rescaleScores(scoredDocs)
-    println(rescaledDocs.toString())
+    println(scoredDocs.toString())
   }
 
   def runCommand(inputValue: String): Unit = {
