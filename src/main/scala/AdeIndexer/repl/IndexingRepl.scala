@@ -5,7 +5,7 @@ package AdeIndexer.repl
 
 import util.control.Breaks.{breakable, break}
 import scala.io.StdIn.readLine
-import AdeIndexer.indexer.Index.searchIndexAndScoreAll
+import AdeIndexer.indexer.lucene.Index.searchIndexAndScoreAll
 import AdeIndexer.postprocessing.Scaler.rescaleScores
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 

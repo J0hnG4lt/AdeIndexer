@@ -3,7 +3,7 @@ package AdeIndexer
 import AdeIndexer.cli.ArgParser
 
 import AdeIndexer.logging.LoggerUtils.prettyPrint
-import AdeIndexer.indexer.Index.{
+import AdeIndexer.indexer.lucene.Index.{
   addFilesToIndex,
   searchIndexAndScoreAll
 }

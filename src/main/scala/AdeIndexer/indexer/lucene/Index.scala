@@ -1,22 +1,16 @@
-package AdeIndexer.indexer
-
-import org.apache.lucene.analysis.standard.{StandardAnalyzer, StandardTokenizerFactory}
-import org.apache.lucene.analysis.custom.CustomAnalyzer
-import org.apache.lucene.document.{Document, Field, FieldType, StringField, TextField}
-import org.apache.lucene.index.{DirectoryReader, IndexOptions, IndexWriter, IndexWriterConfig, Term}
-import org.apache.lucene.store.{Directory, FSDirectory}
-import org.apache.lucene.search.{BooleanClause, BooleanQuery, IndexSearcher, MatchAllDocsQuery, Query, TermQuery}
-import org.apache.lucene.queryparser.classic.QueryParser
-
-import java.util.logging.Logger
-import java.nio.file.{Path, Paths}
-import java.io.{BufferedReader, File, FileReader}
-import util.control.Breaks.{break, breakable}
+package AdeIndexer.indexer.lucene
 
 import AdeIndexer.config.Indexer.AdeIndexerConfig
-import AdeIndexer.indexer.CountSimilarity
 import AdeIndexer.postprocessing.Scaler.rescaleScores
+import org.apache.lucene.analysis.custom.CustomAnalyzer
+import org.apache.lucene.document.{Document, Field, StringField, TextField}
+import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig, Term}
+import org.apache.lucene.search.*
+import org.apache.lucene.store.FSDirectory
 
+import java.nio.file.Path
+import java.util.logging.Logger
+import scala.util.control.Breaks.{break, breakable}
 
 /** Defines all the methods related to the Inverted Index implemented by Lucene.
  *
@@ -27,7 +21,7 @@ object Index {
 
   /** Builds a File System Directory representation for Lucene.
    *
-   * @param directoryUri: the path to the local directory.
+   * @param directoryUri : the path to the local directory.
    * @return a directory representation for Lucene.
    * */
   def buildDirectory(directoryUri: String): FSDirectory = {
@@ -39,13 +33,13 @@ object Index {
    * The contents, filename, filepaths of the files are taken into account.
    * Currently, a simple score based on counts is used as a Similarity measure.
    *
-   * @param config: a config case class for the Indexer.
+   * @param config : a config case class for the Indexer.
    * */
   def addFilesToIndex(config: AdeIndexerConfig): Unit = {
 
     // Get the directory with files and the directory for the index.
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
-    val fileDirectory = buildDirectory(directoryUri=config.directory)
+    val indexDirectory = buildDirectory(directoryUri = config.indexDirectory)
+    val fileDirectory = buildDirectory(directoryUri = config.directory)
 
     // Use a custom analyzer to ensure exact matches. Lucene otherwise would apply NLP transformations to the tokens.
     val analyzer = CustomAnalyzer.builder().withTokenizer("standard").build()
@@ -67,7 +61,7 @@ object Index {
 
           // We only index text files.
           // TODO: extend this for other file formats.
-          if (!filename.endsWith(".txt")){
+          if (!filename.endsWith(".txt")) {
             logger.fine(s"Skipping: $filename")
             break
           }
@@ -109,20 +103,20 @@ object Index {
    * is a simple counter. For example, if query == "Georvic Tur" and "Georvic" appears in the document whereas "Tur"
    * does not appear, then the score would be 50 for that document. If both words appear, then the score would be 100.
    *
-   * @param query: words separated by whitespace.
-   * @param config: a config case class for the Indexer.
+   * @param query  : words separated by whitespace.
+   * @param config : a config case class for the Indexer.
    * @return a map of filepath -> score
    * */
-  def searchIndexByBoolean(query: String, config: AdeIndexerConfig):Map[String, Float] = {
+  def searchIndexByBoolean(query: String, config: AdeIndexerConfig): Map[String, Float] = {
     logger.fine("searchIndexByBoolean")
 
     // Get the directory with the inverted index.
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
+    val indexDirectory = buildDirectory(directoryUri = config.indexDirectory)
     val indexReader = DirectoryReader.open(indexDirectory)
     val totalIndexedDocs = indexReader.numDocs()
 
-    logger.fine("Inverted Index: "+DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
-    logger.fine("Total number of indexed docs: "+totalIndexedDocs)
+    logger.fine("Inverted Index: " + DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
+    logger.fine("Total number of indexed docs: " + totalIndexedDocs)
 
     // Build a searcher for the indexed documents.
     val searcher = new IndexSearcher(indexReader)
@@ -133,10 +127,10 @@ object Index {
     // We use a boolean OR query for all words given as input.
     val booleanQueryBuilder = new BooleanQuery.Builder
     val words = query.split(" ")
-    words.foreach( word => {
-        logger.fine(s"Query Word: $word")
-        booleanQueryBuilder.add(new TermQuery(new Term("contents", word)), BooleanClause.Occur.SHOULD)
-      }
+    words.foreach(word => {
+      logger.fine(s"Query Word: $word")
+      booleanQueryBuilder.add(new TermQuery(new Term("contents", word)), BooleanClause.Occur.SHOULD)
+    }
     )
     val booleanQuery = booleanQueryBuilder.build()
 
@@ -155,20 +149,20 @@ object Index {
 
   /** Retrieves all the documents of the index in config.indexDirectory with a score of 0.
    *
-   * @param query: words separated by whitespace.
-   * @param config: a config case class for the Indexer.
+   * @param query  : words separated by whitespace.
+   * @param config : a config case class for the Indexer.
    * @return a map of filepath -> score
    * */
-  def searchIndexAll(query: String, config: AdeIndexerConfig):Map[String, Float]  = {
+  def searchIndexAll(query: String, config: AdeIndexerConfig): Map[String, Float] = {
     logger.fine("searchIndexAll")
 
     // Get the directory with the inverted index.
-    val indexDirectory = buildDirectory(directoryUri=config.indexDirectory)
+    val indexDirectory = buildDirectory(directoryUri = config.indexDirectory)
     val indexReader = DirectoryReader.open(indexDirectory)
     val totalIndexedDocs = indexReader.numDocs()
 
-    logger.fine("Inverted Index: "+DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
-    logger.fine("Total number of indexed docs: "+totalIndexedDocs)
+    logger.fine("Inverted Index: " + DirectoryReader.listCommits(indexDirectory).toArray().mkString("\n"))
+    logger.fine("Total number of indexed docs: " + totalIndexedDocs)
 
     // Build a searcher for the indexed documents.
     val searcher = new IndexSearcher(indexReader)
@@ -189,15 +183,15 @@ object Index {
   /** Applies [[searchIndexByBoolean]] and [[searchIndexAll]] and then merges their results by using
    * the scores given by [[searchIndexByBoolean]].
    *
-   * @param query: words separated by whitespace.
-   * @param config: a config case class for the Indexer.
+   * @param query  : words separated by whitespace.
+   * @param config : a config case class for the Indexer.
    * @return a map of filepath -> score
    * */
-  def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float]  = {
+  def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float] = {
     logger.fine("searchIndexAndScoreAll")
 
-    val allDocs = searchIndexAll(query=query, config = config)
-    val scoredDocs = searchIndexByBoolean(query=query, config = config)
+    val allDocs = searchIndexAll(query = query, config = config)
+    val scoredDocs = searchIndexByBoolean(query = query, config = config)
 
     // Get all the documents in the index but only use the score given by the query.
     val mergedDocs = allDocs.map(

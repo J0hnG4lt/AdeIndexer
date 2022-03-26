@@ -1,4 +1,5 @@
-package AdeIndexer.indexer
+package AdeIndexer.indexer.lucene
+
 /** Custom similarity for conducting simple counts.
  * */
 

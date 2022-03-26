@@ -1,10 +1,9 @@
-package AdeIndexer.indexer
+package AdeIndexer.indexer.lucene
 
-import org.scalatest.funsuite.AnyFunSuite
-import AdeIndexer.indexer.CountSimilarity
+import AdeIndexer.indexer.lucene.CountSimilarity
 import org.apache.lucene.search.similarities.BasicStats
-
 import org.scalatest.Assertions.assert
+import org.scalatest.funsuite.AnyFunSuite
 
 class CountSimilaritySuite extends AnyFunSuite {
   test("Only use the frequency term") {

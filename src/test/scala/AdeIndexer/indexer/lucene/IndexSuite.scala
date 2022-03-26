@@ -1,15 +1,14 @@
-package AdeIndexer.indexer
+package AdeIndexer.indexer.lucene
 
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.BeforeAndAfterAll
 import AdeIndexer.config.Indexer.AdeIndexerConfig
-import AdeIndexer.indexer.Index.{addFilesToIndex, searchIndexAll, searchIndexAndScoreAll, searchIndexByBoolean}
+import AdeIndexer.indexer.lucene.Index.{addFilesToIndex, searchIndexAll, searchIndexAndScoreAll, searchIndexByBoolean}
 import org.apache.lucene.index.DirectoryReader
 import org.apache.lucene.store.FSDirectory
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 
 class IndexSuite extends AnyFunSuite with BeforeAndAfterAll {
   private val tempDir = Files.createTempDirectory("tempIndex").toFile
