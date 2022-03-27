@@ -26,8 +26,13 @@ class CustomIndexer(folder: Path) {
   }
 
   def loadDocuments(): mutable.IndexedSeq[Path] = {
-    val filePaths = this.getFilePaths()
-    this.documents = Some(filePaths)
+    val filePaths = this.documents match {
+      case None => {
+        this.documents = Some(this.getFilePaths())
+        this.documents.get
+      }
+      case Some(existingDocuments) => existingDocuments
+    }
     filePaths
   }
 
@@ -70,8 +75,13 @@ class CustomIndexer(folder: Path) {
   }
 
   def loadIndex(): mutable.HashMap[String, mutable.HashSet[Int]] = {
-    val index = this.indexDocuments()
-    this.invertedIndex = Some(index)
+    val index = this.invertedIndex match {
+      case None => {
+        this.invertedIndex = Some(this.indexDocuments())
+        this.invertedIndex.get
+      }
+      case Some(existingIndex) => existingIndex
+    }
     index
   }
 

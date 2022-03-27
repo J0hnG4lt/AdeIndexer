@@ -167,7 +167,7 @@ object Index {
     // Build a searcher for the indexed documents.
     val searcher = new IndexSearcher(indexReader)
     val matchAllDocsQuery = new MatchAllDocsQuery()
-    val results = searcher.search(matchAllDocsQuery, 10)
+    val results = searcher.search(matchAllDocsQuery, totalIndexedDocs)
 
     // Search documents and retrieve their paths and scores. The score for this searcher is always zero.
     val scoredDocs = results.scoreDocs.map(
