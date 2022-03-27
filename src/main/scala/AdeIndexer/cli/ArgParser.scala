@@ -13,7 +13,7 @@ object ArgParser {
     val parser = {
       OParser.sequence(
         builder.programName("AdeIndexer"),
-        builder.head("AdeIndexer", "0.0.1"),
+        builder.head("AdeIndexer", "0.0.2"),
         builder.opt[String]('d', "directory")
           .action((directory, config) => config.copy(directory = directory))
           .text("d is the path to a directory with files that will be indexed."),
