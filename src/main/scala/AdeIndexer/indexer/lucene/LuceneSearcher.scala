@@ -10,6 +10,9 @@ import org.apache.lucene.search.{BooleanClause, BooleanQuery, IndexSearcher, Mat
 import java.nio.file.Path
 import java.util.logging.Logger
 
+/** Defines all the methods related to the Search that should be used with Lucene.
+ *
+ * */
 class LuceneSearcher extends SearcherBase {
 
   private val logger = Logger.getLogger(this.getClass.getName)

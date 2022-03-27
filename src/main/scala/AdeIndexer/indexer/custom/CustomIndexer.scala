@@ -7,13 +7,20 @@ import java.io.File
 import scala.collection.mutable
 
 
+/** Defines a custom in-memory indexer that uses mutable data structures defined in Scala Collections.
+ *
+ * */
 class CustomIndexer(folder: Path) {
   var invertedIndex: Option[mutable.HashMap[String, mutable.HashSet[Int]]] = None
   var documents: Option[mutable.IndexedSeq[Path]] = None
   val splitRegex = "\\s+"
   private val logger = Logger.getLogger(this.getClass.getName)
 
-  def getFilePaths(): mutable.IndexedSeq[Path]  = {
+  /*** Gets an indexed sequences of file paths with efficient lookups.
+   *
+   * @return an indexed sequences of file paths.
+   * */
+  def getFilePaths: mutable.IndexedSeq[Path]  = {
     val file = folder.toFile
     if (!file.isDirectory){
       throw IllegalArgumentException("a folder should be given.")
@@ -25,34 +32,48 @@ class CustomIndexer(folder: Path) {
       .to(mutable.IndexedSeq)
   }
 
+  /*** Gets an indexed sequences of file paths with efficient lookups. This is stored into [[this.documents]].
+   *
+   * @return an indexed sequences of file paths.
+   * */
   def loadDocuments(): mutable.IndexedSeq[Path] = {
     val filePaths = this.documents match {
-      case None => {
-        this.documents = Some(this.getFilePaths())
+      case None =>
+        this.documents = Some(this.getFilePaths)
         this.documents.get
-      }
       case Some(existingDocuments) => existingDocuments
     }
     filePaths
   }
 
+  /*** Builds an inverted index for balance efficient lookups and updates. To reduce memory consumption, document IDs
+   * are used.
+   *
+   * @return a hashmap of word -> documents that contain that word.
+   * */
   def indexDocuments(): mutable.HashMap[String, mutable.HashSet[Int]] = {
     val index = this.invertedIndex.getOrElse(
       mutable.HashMap.empty[String, mutable.HashSet[Int]]
     )
     val documents = this.documents.get
-    documents.zip(0 until documents.size).foreach {
-      case (filepath: Path, documentId: Int) => {
+    documents.zipWithIndex.foreach {
+      case (filepath: Path, documentId: Int) =>
         indexDocument(
           filepath = filepath,
           index = index,
           documentId = documentId
         )
-      }
     }
     index
   }
 
+  /*** Mutates [[this.invertedIndex]] for all the words contained in the document represented by [[filepath]] and
+   * adds its [[documentId]] into the hash sets corresponding to these words.
+   *
+   * @param filepath: the filepath of the document with given documentId.
+   * @param index: the data structured where the indexed words are being stored.
+   * @param documentId: the ID of the document that is to be indexed.
+   * */
   def indexDocument(
                      filepath: Path,
                      index:  mutable.HashMap[String, mutable.HashSet[Int]],
@@ -74,12 +95,16 @@ class CustomIndexer(folder: Path) {
     )
   }
 
+  /*** Builds an inverted index for balance efficient lookups and updates. To reduce memory consumption, document IDs
+   * are used. This inverted index is stored into [[this.invertedIndex]]
+   *
+   * @return a hashmap of word -> documents that contain that word.
+   * */
   def loadIndex(): mutable.HashMap[String, mutable.HashSet[Int]] = {
     val index = this.invertedIndex match {
-      case None => {
+      case None =>
         this.invertedIndex = Some(this.indexDocuments())
         this.invertedIndex.get
-      }
       case Some(existingIndex) => existingIndex
     }
     index

@@ -10,7 +10,7 @@ class CustomIndexerSuite extends AnyFunSuite {
   val folder = Paths.get("src", "test", "resources")
   val testTokens = Map("Georvic"->1, "Tur"->2, "Victoria"->1, "Jorge"->1, "Orlene"->1)
   val indexer = CustomIndexer(folder=folder)
-  val filePaths = indexer.getFilePaths()
+  val filePaths = indexer.getFilePaths
   val documents = indexer.loadDocuments()
   val invertedIndex = indexer.loadIndex()
 
