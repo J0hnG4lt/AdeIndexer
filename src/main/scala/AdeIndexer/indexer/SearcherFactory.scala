@@ -7,6 +7,9 @@ import AdeIndexer.indexer.SearcherBase
 
 
 object SearcherFactory {
+
+  val names: List[String] = List("Lucene", "Custom")
+
   def buildSearcher(name: String): SearcherBase = {
     name match {
       case name2 if name2 == "Lucene" => Index()

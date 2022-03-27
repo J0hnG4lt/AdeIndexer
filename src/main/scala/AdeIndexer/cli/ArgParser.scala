@@ -4,6 +4,7 @@ import scopt.OParser
 
 import AdeIndexer.exceptions.CustomExceptions.WrongArgumentsException
 import AdeIndexer.config.ArgParser.ArgParserConfig
+import AdeIndexer.indexer.SearcherFactory
 
 object ArgParser {
 
@@ -21,7 +22,10 @@ object ArgParser {
           .text("i is the path to a directory where the index will be stored"),
         builder.opt[String]('n', "name-indexer")
           .action((indexer, config) => config.copy(indexer = indexer))
-          .text("n is the name of the indexer that will be used."),
+          .validate(indexer =>
+            if (SearcherFactory.names.contains(indexer)) builder.success
+            else builder.failure("Value <max> must be >0"))
+          .text(s"n is the name of the indexer that will be used. Options: ${SearcherFactory.names.mkString(", ")}"),
         builder.opt[String]('q', "query")
           .action((query, config) => config.copy(query = Some(query)))
           .text("q is the query"),
