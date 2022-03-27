@@ -56,7 +56,7 @@ class LuceneSearcher extends SearcherBase {
 
     // We use a boolean OR query for all words given as input.
     val booleanQueryBuilder = new BooleanQuery.Builder
-    val words = query.split(" ")
+    val words = indexer.tokenize(query)
     words.foreach(word => {
       logger.fine(s"Query Word: $word")
       booleanQueryBuilder.add(new TermQuery(new Term("contents", word)), BooleanClause.Occur.SHOULD)
