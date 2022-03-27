@@ -101,7 +101,7 @@ class LuceneIndexer {
   }
 
   def tokenize(doc: String): Array[String] = {
-    doc.split(this.splitRegex)
+    doc.split(this.splitRegex).toSet.toArray
   }
 
 }
