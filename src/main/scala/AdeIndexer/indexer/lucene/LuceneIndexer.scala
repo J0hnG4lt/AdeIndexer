@@ -20,6 +20,7 @@ import scala.util.control.Breaks.{break, breakable}
 class LuceneIndexer {
 
   private val logger = Logger.getLogger(this.getClass.getName)
+  val splitRegex = "\\s+"
 
   /** Builds a File System Directory representation for Lucene.
    *
@@ -99,5 +100,8 @@ class LuceneIndexer {
     logger.info(s"All files in ${config.directory} have been indexed.")
   }
 
+  def tokenize(doc: String): Array[String] = {
+    doc.split(this.splitRegex)
+  }
 
 }
