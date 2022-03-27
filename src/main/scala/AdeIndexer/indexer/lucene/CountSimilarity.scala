@@ -22,7 +22,8 @@ class CountSimilarity extends SimilarityBase {
    * */
   override def score(basicStats: BasicStats, v: Double, v1: Double): Double = {
     logger.fine(s"CountSimilarity v: $v v1: $v1")
-    v
+    logger.fine(s"basic stats ${basicStats.getDocFreq} ${basicStats.getTotalTermFreq} ${basicStats.getNumberOfDocuments} ${basicStats.getNumberOfFieldTokens}")
+    if basicStats.getTotalTermFreq > 0 then 1.toDouble else 0.toDouble
   }
 
   override def toString: String = "CountSimilarity"

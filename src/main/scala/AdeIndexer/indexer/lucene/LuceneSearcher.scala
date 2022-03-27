@@ -121,6 +121,7 @@ class LuceneSearcher extends SearcherBase {
   def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float] = {
     logger.fine("searchIndexAndScoreAll")
 
+    this.addFilesToIndex(config = config)
     val allDocs = searchIndexAll(query = query, config = config)
     val scoredDocs = searchIndexByBoolean(query = query, config = config)
 
@@ -132,7 +133,7 @@ class LuceneSearcher extends SearcherBase {
     )
 
     // Rescale scores to 0 <= x <= 100
-    val docsWithRescaledScores = rescaleScores(mergedDocs)
+    val docsWithRescaledScores = rescaleScores(scoredDocs = mergedDocs, maxValue = Some(query.split(" ").size))
     docsWithRescaledScores
   }
 

@@ -109,9 +109,8 @@ Usage: AdeIndexer [options]
 
 ```bash
 java -Djava.util.logging.config.file=src/main/resources/logging.properties \
-  -jar ./target/adeindexer-0.0.1-SNAPSHOT.jar \
+  -jar ./target/adeindexer-0.0.2-SNAPSHOT.jar \
   -d src/test/resources/ \
-  -i ./index/ \
   -q "Georvic Victoria"
 ```
 
@@ -125,9 +124,8 @@ Map(/home/georvic/repos/infra/AdeIndexer/src/test/resources/names.txt -> 100.0, 
 
 ```bash
 java -Djava.util.logging.config.file=src/main/resources/logging.properties \
-  -jar ./target/adeindexer-0.0.1-SNAPSHOT.jar \
-  -d src/test/resources/ \
-  -i ./index/
+  -jar ./target/adeindexer-0.0.2-SNAPSHOT.jar \
+  -d src/test/resources/
 ```
 
 Something like the following should appear:

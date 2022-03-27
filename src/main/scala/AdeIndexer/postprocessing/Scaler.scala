@@ -11,11 +11,18 @@ object Scaler {
    * @param scoredDocs: a map of identifier -> score.
    * @return the same map, but with rescaled scores.
    * */
-  def rescaleScores(scoredDocs: Map[String, Float]): Map[String, Float] = {
-    val maxValue = scoredDocs.maxBy(_._2)._2
+  def rescaleScores(
+                     scoredDocs: Map[String, Float],
+                   maxValue: Option[Float] = None
+                   ): Map[String, Float] = {
+    val maxVal = maxValue match {
+      case None => scoredDocs.maxBy(_._2)._2
+      case Some(v) => v
+    }
     scoredDocs.map(
       (key: String, value: Float) => {
-        (key, if maxValue > 0 then (value/maxValue)*100 else 0.toFloat)
+        require(value <= maxVal, s"$value is greater than $maxVal")
+        (key, if maxVal > 0 then (value/maxVal)*100 else 0.toFloat)
       }
     )
   }

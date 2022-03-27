@@ -32,18 +32,21 @@ class CustomSearcher extends SearcherBase {
              words: List[String]
            ) :Map[String, Float] = {
     // Get all documents with a 0 score
+    logger.fine(s"${words.size} words in the query.")
     val allDocs = documents.map(
       path => (path.toAbsolutePath.toString, 0.toFloat)
     ).toMap[String, Float]
+    logger.fine(s"${allDocs.size} documents in total.")
 
     // Get all documents in which the words appear
     var appearances = List.empty[String]
     words.foreach(
       word => {
-        val documentsForWord = invertedIndex.apply(word)
+        val documentsForWord = invertedIndex.applyOrElse(word, _ => mutable.HashSet.empty[Int])
         documentsForWord.foreach(
           documentId => {
             val document = documents.apply(documentId)
+            // TODO: this should be done with the document ID:
             appearances = appearances.prepended( document.toAbsolutePath.toString )
           }
         )
@@ -52,13 +55,15 @@ class CustomSearcher extends SearcherBase {
 
     // Sum all occurrences by document and get all the other documents with their default score of 0.
     val scoredDocs = appearances.groupMapReduce(elem => elem)(_ => 1.toFloat)(_ + _)
+    logger.fine(s"${scoredDocs.size} appearances in total.")
+
     val mergedDocs = allDocs.map(
       docAll => {
         (docAll._1, scoredDocs.getOrElse(docAll._1, docAll._2))
       }
     )
     // Rescale scores to 0 <= x <= 100
-    val docsWithRescaledScores = rescaleScores(mergedDocs)
+    val docsWithRescaledScores = rescaleScores(scoredDocs = mergedDocs, maxValue = Some(words.size))
     docsWithRescaledScores
 
   }

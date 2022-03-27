@@ -33,7 +33,7 @@ object Main {
       indexer = argConfig.indexer
     )
 
-    val indexer = buildSearcher(name = "Lucene")
+    val indexer = buildSearcher(name = config.indexer)
 
     // Build the inverted index.
     indexer.addFilesToIndex(config=config)
