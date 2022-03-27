@@ -2,6 +2,8 @@ package AdeIndexer.indexer.lucene
 
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.postprocessing.Scaler.rescaleScores
+import AdeIndexer.indexer.SearcherBase
+
 import org.apache.lucene.analysis.custom.CustomAnalyzer
 import org.apache.lucene.document.{Document, Field, StringField, TextField}
 import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig, Term}
@@ -15,7 +17,7 @@ import scala.util.control.Breaks.{break, breakable}
 /** Defines all the methods related to the Inverted Index implemented by Lucene.
  *
  * */
-object Index {
+class Index extends SearcherBase {
 
   private val logger = Logger.getLogger(this.getClass.getName)
 

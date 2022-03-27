@@ -3,11 +3,12 @@ package AdeIndexer.indexer.custom
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.indexer.custom.CustomIndexer
 import AdeIndexer.postprocessing.Scaler.rescaleScores
+import AdeIndexer.indexer.SearcherBase
 
 import java.nio.file.Path
 import scala.collection.mutable
 
-class CustomSearcher {
+class CustomSearcher extends SearcherBase {
 
   var customIndexer: Option[CustomIndexer] = None
 
@@ -43,15 +44,17 @@ class CustomSearcher {
 
   }
 
+  def addFilesToIndex(config: AdeIndexerConfig): Unit = {
+      val folder = Path.of(config.directory)
+      if ( this.customIndexer.isEmpty ) {
+        this.customIndexer = Some(CustomIndexer(folder=folder))
+      }
+  }
+
   def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float] = {
     val folder = Path.of(config.directory)
-    val indexer = this.customIndexer match {
-      case None => {
-        this.customIndexer = Some(CustomIndexer(folder=folder))
-        this.customIndexer.get
-      }
-      case Some(indexer) => indexer
-    }
+    this.addFilesToIndex(config = config)
+    val indexer = this.customIndexer.get
     val documents = indexer.loadDocuments()
     val invertedIndex = indexer.loadIndex()
 

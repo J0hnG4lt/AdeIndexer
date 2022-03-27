@@ -1,7 +1,7 @@
 package AdeIndexer.indexer.lucene
 
 import AdeIndexer.config.Indexer.AdeIndexerConfig
-import AdeIndexer.indexer.lucene.Index.{addFilesToIndex, searchIndexAll, searchIndexAndScoreAll, searchIndexByBoolean}
+import AdeIndexer.indexer.lucene.Index
 import org.apache.lucene.index.DirectoryReader
 import org.apache.lucene.store.FSDirectory
 import org.scalatest.BeforeAndAfterAll
@@ -18,10 +18,11 @@ class IndexSuite extends AnyFunSuite with BeforeAndAfterAll {
     indexDirectory = tempDir.getAbsolutePath
   )
   private val mockQuery = "Georvic"
+  private val indexer = Index()
 
   test("The inverted index actually index all .txt files.") {
     println(mockConfig.indexDirectory)
-    addFilesToIndex(config = mockConfig)
+    indexer.addFilesToIndex(config = mockConfig)
     val indexDirectory = FSDirectory.open(Path.of(mockConfig.indexDirectory))
     val fileDirectory = FSDirectory.open(Path.of(mockConfig.directory))
     val numberOfFiles = fileDirectory.listAll().count(filename => filename.endsWith(".txt"))
@@ -32,7 +33,7 @@ class IndexSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   test("searchIndexAll should return all documents.") {
 
-    val scoredDocs = searchIndexAll(query = mockQuery, config = mockConfig)
+    val scoredDocs = indexer.searchIndexAll(query = mockQuery, config = mockConfig)
     val fileDirectory = FSDirectory.open(Path.of(mockConfig.directory))
     val numberOfFiles = fileDirectory.listAll().count(filename => filename.endsWith(".txt"))
     val numberOfRetrievedScoredDocs = scoredDocs.size
@@ -41,7 +42,7 @@ class IndexSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   test("searchIndexByBoolean should return only matched documents.") {
 
-    val scoredDocs = searchIndexByBoolean(query = mockQuery, config = mockConfig)
+    val scoredDocs = indexer.searchIndexByBoolean(query = mockQuery, config = mockConfig)
     val fileDirectory = FSDirectory.open(Path.of(mockConfig.directory))
     val numberOfFilesWithMatchingQuery = 1
     val numberOfRetrievedScoredDocs = scoredDocs.size
@@ -53,7 +54,7 @@ class IndexSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   test("searchIndexAndScoreAll should return all documents, but only rank matching docs.") {
 
-    val scoredDocs = searchIndexAndScoreAll(query = mockQuery, config = mockConfig)
+    val scoredDocs = indexer.searchIndexAndScoreAll(query = mockQuery, config = mockConfig)
     val fileDirectory = FSDirectory.open(Path.of(mockConfig.directory))
     val numberOfFiles = fileDirectory.listAll().count(filename => filename.endsWith(".txt"))
     val numberOfRetrievedScoredDocs = scoredDocs.size

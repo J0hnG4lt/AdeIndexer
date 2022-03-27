@@ -3,12 +3,9 @@ package AdeIndexer
 import AdeIndexer.cli.ArgParser
 
 import AdeIndexer.logging.LoggerUtils.prettyPrint
-import AdeIndexer.indexer.lucene.Index.{
-  addFilesToIndex,
-  searchIndexAndScoreAll
-}
 import AdeIndexer.config.Indexer.AdeIndexerConfig
 import AdeIndexer.config.ArgParser.ArgParserConfig
+import AdeIndexer.indexer.SearcherFactory.buildSearcher
 import java.util.logging.Logger
 import AdeIndexer.repl.IndexingRepl
 
@@ -32,18 +29,21 @@ object Main {
     // Configure our indexer with the input arguments.
     val config = AdeIndexerConfig(
       directory = argConfig.directory,
-      indexDirectory = argConfig.indexDirectory
+      indexDirectory = argConfig.indexDirectory,
+      indexer = argConfig.indexer
     )
 
+    val indexer = buildSearcher(name = "Lucene")
+
     // Build the inverted index.
-    addFilesToIndex(config=config)
+    indexer.addFilesToIndex(config=config)
 
     // if a query is given, then return all scored documents. Otherwise, start a REPL and wait for user input.
     val repl = new IndexingRepl(config=config)
     var scoredDocs: Option[Map[String, Float]] = None
     argConfig.query match {
       case None => repl.startReplLoop()
-      case Some(query) => scoredDocs = Some(searchIndexAndScoreAll(query=query, config=config))
+      case Some(query) => scoredDocs = Some(indexer.searchIndexAndScoreAll(query=query, config=config))
     }
     scoredDocs match {
       case Some(docs) => println(docs.mkString("\n"))

@@ -8,6 +8,7 @@ object ArgParser {
                               directory: String = System.getProperty("user.dir"),
                               indexDirectory: String = Paths.get(System.getProperty("user.dir"), "index").toString,
                               query: Option[String] = None,
+                              indexer: String = "Custom",
                               wrongArgument: Boolean = false
                             )
 }

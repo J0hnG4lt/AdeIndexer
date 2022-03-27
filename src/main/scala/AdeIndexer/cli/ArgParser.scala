@@ -19,6 +19,9 @@ object ArgParser {
         builder.opt[String]('i', "index-directory")
           .action((indexDirectory, config) => config.copy(indexDirectory = indexDirectory))
           .text("i is the path to a directory where the index will be stored"),
+        builder.opt[String]('n', "name-indexer")
+          .action((indexer, config) => config.copy(indexer = indexer))
+          .text("n is the name of the indexer that will be used."),
         builder.opt[String]('q', "query")
           .action((query, config) => config.copy(query = Some(query)))
           .text("q is the query"),

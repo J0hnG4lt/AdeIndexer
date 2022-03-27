@@ -3,11 +3,12 @@ package AdeIndexer.repl
 /** A Domain specific language for our Read-Eval-Print Loop that applies our Lucene Indexer.
  * */
 
-import util.control.Breaks.{breakable, break}
+import util.control.Breaks.{break, breakable}
 import scala.io.StdIn.readLine
-import AdeIndexer.indexer.lucene.Index.searchIndexAndScoreAll
+import AdeIndexer.indexer.SearcherFactory.buildSearcher
 import AdeIndexer.postprocessing.Scaler.rescaleScores
 import AdeIndexer.config.Indexer.AdeIndexerConfig
+import AdeIndexer.indexer.SearcherBase
 
 /**
  * An enum for all the commands that we can use in the Read-Eval-Print Loop. This is like our DSL.
@@ -26,6 +27,7 @@ object Commands extends Enumeration {
 class IndexingRepl(config: AdeIndexerConfig) {
 
   private val commands: String = Commands.values.mkString(", ")
+  private val indexer: SearcherBase = buildSearcher(name = config.indexer)
 
   private val instructions: String =
     s"""
@@ -50,7 +52,7 @@ class IndexingRepl(config: AdeIndexerConfig) {
    * @param words: words separated by single spaces.
    * */
   def runIndexer(words: String):Unit = {
-    val scoredDocs = searchIndexAndScoreAll(query=words, config=config)
+    val scoredDocs = this.indexer.searchIndexAndScoreAll(query=words, config=config)
     println(scoredDocs.mkString("\n"))
   }
 
