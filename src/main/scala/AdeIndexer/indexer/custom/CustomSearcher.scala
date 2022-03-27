@@ -6,6 +6,7 @@ import AdeIndexer.postprocessing.Scaler.rescaleScores
 import AdeIndexer.indexer.SearcherBase
 
 import java.nio.file.Path
+import java.util.logging.Logger
 import scala.collection.mutable
 
 
@@ -15,6 +16,7 @@ import scala.collection.mutable
 class CustomSearcher extends SearcherBase {
 
   var customIndexer: Option[CustomIndexer] = None
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   /*** Counts the number of occurrences of all the words in every document and, then, rescales
    * into 0 <= x <= 100. 0 for no occurrences and 100 for all occurrences.
@@ -67,6 +69,7 @@ class CustomSearcher extends SearcherBase {
    * @param config : the config for the indexer.
    * */
   def addFilesToIndex(config: AdeIndexerConfig): Unit = {
+    logger.fine("addFilesToIndex")
       val folder = Path.of(config.directory)
       if ( this.customIndexer.isEmpty ) {
         this.customIndexer = Some(CustomIndexer(folder=folder))
@@ -80,6 +83,7 @@ class CustomSearcher extends SearcherBase {
    * @return a map of filepath -> score
    * */
   def searchIndexAndScoreAll(query: String, config: AdeIndexerConfig): Map[String, Float] = {
+    logger.fine("searchIndexAndScoreAll")
     val folder = Path.of(config.directory)
     this.addFilesToIndex(config = config)
     val indexer = this.customIndexer.get

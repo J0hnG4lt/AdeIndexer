@@ -43,6 +43,7 @@ class CustomIndexer(folder: Path) {
         this.documents.get
       case Some(existingDocuments) => existingDocuments
     }
+    logger.info("Document paths loaded into memory.")
     filePaths
   }
 
@@ -107,6 +108,7 @@ class CustomIndexer(folder: Path) {
         this.invertedIndex.get
       case Some(existingIndex) => existingIndex
     }
+    logger.info("Index loaded into memory.")
     index
   }
 
