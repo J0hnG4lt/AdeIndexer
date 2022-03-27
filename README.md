@@ -1,8 +1,22 @@
 # AdeIndexer
 
-A command line tool that builds an inverted index on a folder with .txt files and allows for the execution of 
-efficient searches on it. By default, an index directory will be created on the current directory if no `-i` option 
-is specified. This solution builds the inverted index on the file system rather than having it in memory.
+A command line tool that builds an inverted index on a folder with .txt files and allows for the execution of
+efficient searches on it. 
+
+## Implementations
+
+### Custom in-memory solution (this indexer is used by default)
+
+An custom in-memory index was built with two Scala Collections:
+
+- A mutable indexed sequence whose values are filepaths and whose indices represent document IDs. This collection was chosen for its constant-time lookup.
+- A mutable Hash Map for efficient lookups and updates. Its keys represent words and its values represent Hash Sets of document Ids. Document IDs are stored instead of Paths to reduce memory requirements.
+
+### With Lucene
+
+By default, an index directory will be created on the current directory if no `-i` option
+is specified. This solution builds the inverted index on the file system rather than having it in memory. To use this
+indexer, use the following option: `-n Lucene`.
 
 ## Layout and conventions
 
@@ -15,31 +29,45 @@ src/
 │       └── AdeIndexer
 │           ├── cli
 │           │   └── ArgParser.scala
-│           ├── config: here we define all the config used by the package.
+│           ├── config
 │           │   ├── ArgParser.scala
 │           │   └── Indexer.scala
 │           ├── exceptions
 │           │   └── CustomExceptions.scala
-│           ├── indexer: all the code related to Lucene here.
-│           │   ├── CountSimilarity.scala: a custom similarity measure.
-│           │   └── Index.scala: all the code related to the inverted index and searches.
+│           ├── indexer
+│           │   ├── custom
+│           │   │   ├── CustomIndexer.scala
+│           │   │   └── CustomSearcher.scala
+│           │   ├── lucene
+│           │   │   ├── CountSimilarity.scala
+│           │   │   ├── LuceneIndexer.scala
+│           │   │   └── LuceneSearcher.scala
+│           │   ├── SearcherBase.scala
+│           │   └── SearcherFactory.scala
 │           ├── logging
 │           │   └── LoggerUtils.scala
-│           ├── Main.scala: entrypoint for the JAR
+│           ├── Main.scala
 │           ├── postprocessing
-│           │   └── Scaler.scala: a utility function for rescaling scores to 0 <= x <= 100
+│           │   └── Scaler.scala
 │           └── repl
 │               └── IndexingRepl.scala
 └── test
     ├── resources
     │   ├── names2.txt
     │   ├── names3.txt
-    │   └── names.txt
+    │   ├── names.txt
+    │   └── something_else.yaml
     └── scala
         └── AdeIndexer
             └── indexer
-                ├── CountSimilaritySuite.scala
-                └── IndexSuite.scala
+                ├── custom
+                │   ├── CustomIndexerSuite.scala
+                │   └── CustomSearcherSuite.scala
+                └── lucene
+                    ├── CountSimilaritySuite.scala
+                    ├── LuceneIndexSuite.scala
+                    └── LuceneSearcherSuite.scala
+
 
 ```
 
@@ -58,20 +86,23 @@ Use the parameter `-Djava.util.logging.config.file=src/main/resources/logging.pr
 ### Get help
 
 ```bash
-java -Djava.util.logging.config.file=src/main/resources/logging.properties -jar ./target/adeindexer-0.0.1-SNAPSHOT.jar --help
+java -Djava.util.logging.config.file=src/main/resources/logging.properties -jar ./target/adeindexer-0.0.2-SNAPSHOT.jar --help
 ```
 
 The following should appear:
 
 ```commandline
-AdeIndexer 0.0.1
+AdeIndexer 0.0.2
 Usage: AdeIndexer [options]
 
   -d, --directory <value>  d is the path to a directory with files that will be indexed.
   -i, --index-directory <value>
                            i is the path to a directory where the index will be stored
+  -n, --name-indexer <value>
+                           n is the name of the indexer that will be used. Options: Lucene, Custom
   -q, --query <value>      q is the query
   --help                   prints this usage text
+
 ```
 
 ### Build an inverted index and execute a single search:
