@@ -7,9 +7,9 @@ efficient searches on it.
 
 ### Custom in-memory solution (this indexer is used by default)
 
-An custom in-memory index was built with two Scala Collections:
+A custom in-memory index was built with two Scala Collections:
 
-- A mutable indexed sequence whose values are filepaths and whose indices represent document IDs. This collection was chosen for its constant-time lookup.
+- A mutable indexed sequence whose values are file paths and whose indices represent document IDs. This collection was chosen for its constant-time lookup.
 - A mutable Hash Map for efficient lookups and updates. Its keys represent words and its values represent Hash Sets of document Ids. Document IDs are stored instead of Paths to reduce memory requirements.
 
 ### With Lucene

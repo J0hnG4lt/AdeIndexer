@@ -1,6 +1,6 @@
 package AdeIndexer.repl
 
-/** A Domain specific language for our Read-Eval-Print Loop that applies our Lucene Indexer.
+/** A Domain specific language for our Read-Eval-Print Loop that applies our Indexer.
  * */
 
 import util.control.Breaks.{break, breakable}
@@ -21,8 +21,8 @@ object Commands extends Enumeration {
 }
 
 /**
- * @constructor Create a repl (Read-Eval-Print Loop) object for the application of the Lucene Indexer.
- * @param config: a configuration object for the Lucene Indexer.
+ * @constructor Create a repl (Read-Eval-Print Loop) object for the application of the Indexer.
+ * @param config: a configuration object for the Indexer.
  * */
 class IndexingRepl(config: AdeIndexerConfig) {
 
