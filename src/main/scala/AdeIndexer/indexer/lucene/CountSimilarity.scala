@@ -15,7 +15,8 @@ class CountSimilarity extends SimilarityBase {
 
   private val logger = Logger.getLogger(this.getClass.getName)
 
-  /** Return the number of times a term has occurred in a document.
+  /** Return the 1 if the term appears in the document. Otherwise, return 0. This is not called if the term does not
+   * appear in any document.
    * @param basicStats: See [[org.apache.lucene.search.similarities.BasicStats]].
    * @param v: the number of times a term has occurred in a document.
    * @param v1: the document length.
